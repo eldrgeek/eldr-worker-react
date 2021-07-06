@@ -9,20 +9,17 @@ const importWorker = (workercode) => {
 	return worker_script;
 };
 // import importWorker from './importWorker';
-const useWorker = (code) => {
+const useWorker = (workercode) => {
 	const [worker, setWorker] = React.useState(null);
 	React.useEffect(() => {
 		// const worker = new Worker(worker_script);
-		const worker = new Worker(importWorker(code));
-		// console.log("Using worker",worker)
-
+		const worker = new Worker(importWorker(workercode));
+		console.log('set worker');
 		setWorker(worker);
-		// worker.addEventListener('message', onMessage);
 		return () => {
-			// worker.removeEventListener('error', onMessage);
 			worker.terminate();
 		};
-	}, []);
+	}, [workercode]);
 	return worker;
 };
 
