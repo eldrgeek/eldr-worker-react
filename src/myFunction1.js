@@ -1,31 +1,40 @@
 import * as React from "react";
 import workercode from "./workercode";
+import timerWorker from "./timerWorker";
 
 import useWorker from "./useWorker";
-// import importWorker from './importWorker';
 
-const MyClass = () => {
-  const [count, setCount] = React.useState(0);
+const MyFunction = () => {
+  const [state, setState] = React.useState({});
+  const [timerState, setTimerState] = React.useState({});
   const onMessage = (ev) => {
-    setCount(ev.data.count);
+    setState(ev.data);
+  };
+  const onTimerMessage = (ev) => {
+    setTimerState(ev.data);
   };
 
-  const worker = useWorker(workercode);
-  const handleClick = () => {
-    console.log("Posting message");
-    worker.postMessage("Button clicked");
+  const worker = useWorker(workercode, onMessage);
+  const tWorker = useWorker(timerWorker, onTimerMessage);
+
+  const resetCount = () => {
+    worker.postMessage({ message: "setlimit", limit: 20 });
+  };
+  const resetTimer = () => {
+    tWorker.postMessage({ message: "getTime" });
   };
 
-  React.useEffect(() => {
-    console.log("using effect", worker);
-    if (worker) {
-      worker.addEventListener("message", onMessage);
-      handleClick();
-    } // if(!worke}r) handleClick()
-    // eslint-disable-next-line
-  }, [worker]);
-
-  return <div>Button test {count}</div>;
+  return (
+    <div>
+      <h1> BG test </h1>
+      Button test {state.count} {state.instance}
+      <br />
+      {timerState.hour} {timerState.minute} {timerState.second}
+      <br />
+      <button onClick={resetCount}>Reset</button>
+      <button onClick={resetTimer}>Timer</button>
+    </div>
+  );
 };
 
-export default MyClass;
+export default MyFunction;

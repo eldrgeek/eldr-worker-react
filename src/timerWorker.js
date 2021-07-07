@@ -1,17 +1,23 @@
-const workercode = () => {
-  console.log("loaded workercode");
+const timerWorker = () => {
+  const time = new Date();
   let state = {
-    count: 0,
-    instance: 0,
-    limit: 0
+    hour: 0,
+    minute: 0,
+    second: 0,
+    instance: 0
   };
+  const getTime = (time) => {
+    state.hour = time.getHours();
+    state.minute = time.getMinutes();
+    state.second = time.getSeconds();
+  };
+  getTime(time);
   let interval = null;
   // no-restricted-globals
   // eslint-disable-next-line
   self.onmessage = function (e) {
-    if (e.data.message === "setlimit") {
-      state.limit = e.data.limit;
-      state.count = 0;
+    if (e.data.message === "getTime") {
+      getTime(new Date());
     }
 
     state.instance++;
@@ -20,12 +26,10 @@ const workercode = () => {
     // console.log("message received in main script");
     if (interval) clearInterval(interval);
     interval = setInterval(() => {
-      // ++ + ' main: ' + e.data + 'dhhhdf';
-      console.log(state.count++ + " Message back to main script");
-      // self.postMessage(api.message()); // eslint-disable-line no-restricted-globals
+      getTime(new Date());
       self.postMessage(state); // eslint-disable-line no-restricted-globals
     }, 1000);
   };
 };
 
-export default workercode;
+export default timerWorker;
